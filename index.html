@@ -1,10 +1,291 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8"/>
+    <title>React [RU] Tutorial v2</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/prop-types@15.6/prop-types.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+    <style>
+        .none {
+            display: none;
+        }
+
+        body {
+            background: rgba(0, 102, 255, 0.38);
+            font-family: sans-serif;
+        }
+
+        p {
+            margin: 0 0 5px;
+        }
+
+        .article {
+            background: #FFF;
+            border: 1px solid rgba(0, 89, 181, 0.82);
+            width: 600px;
+            margin: 0 0 5px;
+            box-shadow: 2px 2px 5px -1px rgb(0, 81, 202);
+            padding: 3px 5px;
+        }
+
+        .news__author {
+            text-decoration: underline;
+            color: #007DDC;
+        }
+
+        .news__count {
+            margin: 10px 0 0 0;
+            display: block;
+        }
+
+        .test-input {
+            margin: 0 5px 5px 0;
+        }
+
+        .add {
+            margin: 30px 5px 5px 0;
+            width: 210px;
+            border: 1px dashed rgba(0, 89, 181, 0.82);
+            padding: 5px;
+        }
+
+        .add__author, .add__text, .add__btn, .add__checkrule {
+            display: block;
+            margin: 0 0 5px 0;
+            padding: 5px;
+            width: 94%;
+            border: 1px solid rgba(0, 89, 181, 0.82);
+        }
+
+        .add__checkrule {
+            border: none;
+            font-size: 12px;
+        }
+
+        .add__btn {
+            box-sizing: content-box;
+            color: #FFF;
+            text-transform: uppercase;
+            background: #007DDC;
+        }
+
+        .add__btn:disabled {
+            background: #CCC;
+            color: #999;
+        }
+    </style>
 </head>
 <body>
+<div id="root"></div>
+<script type="text/babel">
+
+    const myNews = [
+        {
+            id: 1,
+            author: 'Max Smirnov',
+            title: 'React',
+            bigText: 'Освежил знания по реакту, пора двигаться дальше!'
+        },
+    ];
+
+    class Article extends React.Component {
+        state = {
+            visible: false,
+        }
+        handleReadMoreClck = (e) => {
+            e.preventDefault()
+            this.setState({visible: !this.state.visible})
+        }
+
+        render() {
+            const {author, title, bigText} = this.props.data
+            const {visible} = this.state
+            return (
+                <div className='article'>
+                    <p className='news__author'>{author}:</p>
+                    <p className='news__text'>{title}</p>
+                    {
+                        !(this.state.visible) &&
+                        <a onClick={this.handleReadMoreClck} href="#" className='news__readmore'>Подробнее</a>
+                    }
+                    {
+                        (this.state.visible) &&
+                        <React.Fragment>
+                            <a onClick={this.handleReadMoreClck} href="#" className='news__readmore'>Скрыть</a>
+                            <p className='news__big-text'>{bigText}</p>
+                        </React.Fragment>
+                    }
+                </div>
+            )
+        }
+    }
+
+    Article.propTypes = {
+        data: PropTypes.shape({
+            id: PropTypes.number.isRequired,
+            author: PropTypes.string.isRequired,
+            title: PropTypes.string.isRequired,
+            bigText: PropTypes.string.isRequired
+        })
+    }
+
+    class News extends React.Component {
+        state = {
+            counter: 0,
+        }
+        renderNews = () => {
+            const {data} = this.props
+            let newsTemplate = null
+
+            if (data.length) {
+                newsTemplate = data.map(function (item) {
+                    return <Article key={item.id} data={item}/>
+                })
+            } else {
+                newsTemplate = <p>К сожалению новостей нет</p>
+            }
+
+            return newsTemplate
+        }
+
+        render() {
+            const {data} = this.props
+            const {counter} = this.state
+
+            return (
+                <div className='news'>
+                    {this.renderNews()}
+                    {
+                        data.length ? <strong className={'news__count'}>Всего новостей: {data.length}</strong> : null
+                    }
+                </div>
+            );
+        }
+    }
+
+    News.propTypes = {
+        data: PropTypes.array.isRequired
+    }
+
+    class Add extends React.Component {
+        constructor(props) {
+            super(props)
+            this.input = React.createRef()
+        }
+
+        state = {
+            name: '',
+            textNews: '',
+            title:'',
+            checkRule: false
+        };
+
+        componentDidMount() {
+            this.input.current.focus()
+        }
+
+        onBtnClickHandler = (e) => {
+            e.preventDefault()
+            const {name: author, title, textNews: bigText} = this.state;
+            this.props.onAddNews({author,title, bigText})
+        }
+
+
+        handleChange = (e) => {
+            const {id, value} = e.currentTarget
+            this.setState({[id]: e.currentTarget.value})
+        }
+
+
+        handleRuleCheck = (e) => {
+            this.setState({checkRule: e.currentTarget.checked})
+        }
+
+        validate = () => {
+            const {textNews, title, name, checkRule} = this.state;
+            return (name.trim() && title.trim() && textNews.trim() && checkRule) ? false : true
+
+
+        }
+
+        render() {
+
+            const {name,title, textNews, checkRule} = this.state;
+
+            return <form className='add'>
+                <input
+                    id="name"
+                    ref={this.input}
+                    type='text'
+                    className='add__author'
+                    placeholder='Ваше имя'
+                    value={name}
+                    onChange={this.handleChange}
+                />
+                <input
+                    id="title"
+                    ref={this.input}
+                    type='text'
+                    className='add__author'
+                    placeholder='Заголовок'
+                    value={title}
+                    onChange={this.handleChange}
+                />
+                <textarea
+                    id="textNews"
+                    className='add__text'
+                    placeholder='Текст новости'
+                    value={textNews}
+                    onChange={this.handleChange}>
+                    </textarea>
+                <label className='add__checkrule'>
+                    <input
+                        onChange={this.handleRuleCheck}
+                        type='checkbox'/> Я согласен с правилами
+                </label>
+                <button
+                    disabled={this.validate()}
+                    className='add__btn'
+                    onClick={this.onBtnClickHandler}>
+                    Показать alert
+                </button>
+            </form>
+        }
+    }
+
+    class App extends React.Component {
+
+        state = {
+            news: myNews
+        };
+
+        handleAddNews = (data) => {
+            data.id = this.state.news.length + 1;
+            const nextNews = [data, ...this.state.news];
+            this.setState({news: nextNews})
+        };
+
+
+        render() {
+            return (
+                <React.Fragment>
+                    <h3>Новости</h3>
+                    <News data={this.state.news}/>
+                    <Add onAddNews={this.handleAddNews}/>
+                </React.Fragment>
+            )
+        }
+    }
+
+    ReactDOM.render(
+        <App/>,
+        document.getElementById('root')
+    );
+
+</script>
 
 </body>
 </html>
