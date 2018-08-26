@@ -5,9 +5,8 @@
     <title>React [RU] Tutorial v2</title>
     <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
     <script src="https://unpkg.com/prop-types@15.6/prop-types.js"></script>
-
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
 
     <style>
         .none {
@@ -41,6 +40,42 @@
             margin: 10px 0 0 0;
             display: block;
         }
+
+        .test-input {
+            margin: 0 5px 5px 0;
+        }
+
+        .add {
+            margin: 30px 5px 5px 0;
+            width: 210px;
+            border: 1px dashed rgba(0, 89, 181, 0.82);
+            padding: 5px;
+        }
+
+        .add__author, .add__text, .add__btn, .add__checkrule {
+            display: block;
+            margin: 0 0 5px 0;
+            padding: 5px;
+            width: 94%;
+            border: 1px solid rgba(0, 89, 181, 0.82);
+        }
+
+        .add__checkrule {
+            border: none;
+            font-size: 12px;
+        }
+
+        .add__btn {
+            box-sizing: content-box;
+            color: #FFF;
+            text-transform: uppercase;
+            background: #007DDC;
+        }
+
+        .add__btn:disabled {
+            background: #CCC;
+            color: #999;
+        }
     </style>
 </head>
 <body>
@@ -50,57 +85,36 @@
     const myNews = [
         {
             id: 1,
-            author: 'Саша Печкин',
-            text: 'В четверг, четвертого числа...',
-            bigText: 'в четыре с четвертью часа четыре чёрненьких чумазеньких чертёнка чертили чёрными чернилами чертёж.'
+            author: 'Max Smirnov',
+            title: 'React',
+            bigText: 'Освежил знания по реакту, пора двигаться дальше!'
         },
-        {
-            id: 2,
-            author: 'Просто Вася',
-            text: 'Считаю, что $ должен стоить 35 рублей!',
-            bigText: 'А евро 42!'
-        },
-        {
-            id: 3,
-            author: 'Max Frontend',
-            text: 'Прошло 2 года с прошлых учебников, а $ так и не стоит 35',
-            bigText: 'А евро опять выше 70.'
-        },
-        {
-            id: 4,
-            author: 'Гость',
-            text: 'Бесплатно. Без смс, про реакт, заходи - https://maxpfrontend.ru',
-            bigText: 'Еще есть группа VK, telegram и канал на youtube! Вся инфа на сайте, не реклама!'
-        }
     ];
 
     class Article extends React.Component {
-
         state = {
-            visible: false, // определили начальное состояние
-        };
-
-        handleReadMoreClick = (e) => { // добавили метод
-            e.preventDefault();
+            visible: false,
+        }
+        handleReadMoreClck = (e) => {
+            e.preventDefault()
             this.setState({visible: !this.state.visible})
-        };
+        }
 
         render() {
-            console.log("article render");
-            const {author, text, bigText} = this.props.data // вытащили bigText из даты
+            const {author, title, bigText} = this.props.data
+            const {visible} = this.state
             return (
                 <div className='article'>
                     <p className='news__author'>{author}:</p>
-                    <p className='news__text'>{text}</p>
-
+                    <p className='news__text'>{title}</p>
                     {
                         !(this.state.visible) &&
-                        <a onClick={this.handleReadMoreClick} href="#" className='news__readmore'>Подробнее</a>
+                        <a onClick={this.handleReadMoreClck} href="#" className='news__readmore'>Подробнее</a>
                     }
                     {
                         (this.state.visible) &&
                         <React.Fragment>
-                            <a onClick={this.handleReadMoreClick} href="#" className='news__readmore'>Короче</a>
+                            <a onClick={this.handleReadMoreClck} href="#" className='news__readmore'>Скрыть</a>
                             <p className='news__big-text'>{bigText}</p>
                         </React.Fragment>
                     }
@@ -111,27 +125,20 @@
 
     Article.propTypes = {
         data: PropTypes.shape({
+            id: PropTypes.number.isRequired,
             author: PropTypes.string.isRequired,
-            text: PropTypes.string.isRequired,
-            bigText: PropTypes.string.isRequired // добавили propTypes для bigText
+            title: PropTypes.string.isRequired,
+            bigText: PropTypes.string.isRequired
         })
     }
 
     class News extends React.Component {
-
         state = {
-            count: 0, // определили начальное состояние
-        };
-
-        handleClickCounter = (e) => { // добавили метод
-            e.preventDefault();
-            this.setState({count: ++this.state.count})
-        };
-
-
+            counter: 0,
+        }
         renderNews = () => {
-            const {data} = this.props;
-            let newsTemplate = null;
+            const {data} = this.props
+            let newsTemplate = null
 
             if (data.length) {
                 newsTemplate = data.map(function (item) {
@@ -142,69 +149,136 @@
             }
 
             return newsTemplate
-        };
+        }
 
         render() {
-            const {data} = this.props;
-            const {count} = this.state;
+            const {data} = this.props
+            const {counter} = this.state
 
             return (
-                <div onClick={this.handleClickCounter} className="news">
+                <div className='news'>
                     {this.renderNews()}
                     {
                         data.length ? <strong className={'news__count'}>Всего новостей: {data.length}</strong> : null
                     }
-                    <p>Всего кликов: {count}</p>
                 </div>
             );
         }
     }
 
-
     News.propTypes = {
-        data: PropTypes.array.isRequired // PropTypes (с большой буквы) = библиотека prop-types
-    };
+        data: PropTypes.array.isRequired
+    }
 
-    class TestInput extends React.Component {
+    class Add extends React.Component {
+        constructor(props) {
+            super(props)
+            this.input = React.createRef()
+        }
 
         state = {
-            input: '',
-            output: '',
+            name: '',
+            textNews: '',
+            title:'',
+            checkRule: false
         };
 
-        inputHandler = (e) => {
-            this.setState({input: e.currentTarget.value})
+        componentDidMount() {
+            this.input.current.focus()
+        }
+
+        onBtnClickHandler = (e) => {
+            e.preventDefault()
+            const {name: author, title, textNews: bigText} = this.state;
+            this.props.onAddNews({author,title, bigText})
+        }
+
+
+        handleChange = (e) => {
+            const {id, value} = e.currentTarget
+            this.setState({[id]: e.currentTarget.value})
+        }
+
+
+        handleRuleCheck = (e) => {
+            this.setState({checkRule: e.currentTarget.checked})
+        }
+
+        validate = () => {
+            const {textNews, title, name, checkRule} = this.state;
+            return (name.trim() && title.trim() && textNews.trim() && checkRule) ? false : true
+
+
+        }
+
+        render() {
+
+            const {name,title, textNews, checkRule} = this.state;
+
+            return <form className='add'>
+                <input
+                    id="name"
+                    ref={this.input}
+                    type='text'
+                    className='add__author'
+                    placeholder='Ваше имя'
+                    value={name}
+                    onChange={this.handleChange}
+                />
+                <input
+                    id="title"
+                    ref={this.input}
+                    type='text'
+                    className='add__author'
+                    placeholder='Заголовок'
+                    value={title}
+                    onChange={this.handleChange}
+                />
+                <textarea
+                    id="textNews"
+                    className='add__text'
+                    placeholder='Текст новости'
+                    value={textNews}
+                    onChange={this.handleChange}>
+                    </textarea>
+                <label className='add__checkrule'>
+                    <input
+                        onChange={this.handleRuleCheck}
+                        type='checkbox'/> Я согласен с правилами
+                </label>
+                <button
+                    disabled={this.validate()}
+                    className='add__btn'
+                    onClick={this.onBtnClickHandler}>
+                    Показать alert
+                </button>
+            </form>
+        }
+    }
+
+    class App extends React.Component {
+
+        state = {
+            news: myNews
         };
 
-        outputHandler = () => {
-            this.setState({output: this.state.input})
+        handleAddNews = (data) => {
+            data.id = this.state.news.length + 1;
+            const nextNews = [data, ...this.state.news];
+            this.setState({news: nextNews})
         };
+
 
         render() {
             return (
                 <React.Fragment>
-                    <input onChange={this.inputHandler} className='test-input' placeholder="Введите значение" value={this.state.input} />
-                    <button onClick={this.outputHandler}>PUSH MESSAGE</button>
-                    {
-                        this.state.output ? <h1>Вы ввели: {this.state.output}</h1> : null
-                    }
+                    <h3>Новости</h3>
+                    <News data={this.state.news}/>
+                    <Add onAddNews={this.handleAddNews}/>
                 </React.Fragment>
             )
         }
     }
-
-
-
-
-    const App = () => {
-        return (
-            <React.Fragment>
-                <TestInput/>
-                <h3>Новости</h3>
-                <News data={myNews}/>
-            </React.Fragment>
-        )
-    };
 
     ReactDOM.render(
         <App/>,
