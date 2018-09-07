@@ -81,7 +81,7 @@ class Add extends React.Component {
                 disabled={this.validate()}
                 className='add__btn'
                 onClick={this.onBtnClickHandler}>
-                Показать alert
+                 Добавить новость
             </button>
         </form>
     }

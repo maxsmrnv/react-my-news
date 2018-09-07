@@ -8,11 +8,40 @@ class News extends React.Component {
     state = {
         counter: 0,
     }
+
+
+    // static getDerivedStateFromProps(props, state) {
+    //     let nextFilteredNews = [...props.data] // было nextProps - переименовали
+    //
+    //     nextFilteredNews.forEach((item, index) => {
+    //         if (item.bigText.toLowerCase().indexOf('pubg') !== -1) {
+    //             item.bigText = 'СПАМ'
+    //         }
+    //     })
+    //
+    //     return { // возвращаем новое состояние
+    //         filteredNews: nextFilteredNews,
+    //     }
+    // }
+
+    // componentWillReceiveProps(nextProps) {
+    //     let nextFilteredNews = [...nextProps.data]
+    //
+    //     nextFilteredNews.forEach((item, index) => {
+    //         if (item.bigText.toLowerCase().indexOf('pubg') !== -1) {
+    //             item.bigText = 'СПАМ'
+    //         }
+    //     })
+    //
+    //     this.setState({ filteredNews: nextFilteredNews })
+    // }
+
+
     renderNews = () => {
         const {data} = this.props
         let newsTemplate = null
 
-        if (data.length) {
+        if (data) {
             newsTemplate = data.map(function (item) {
                 return <Article key={item.id} data={item}/>
             })
@@ -30,7 +59,7 @@ class News extends React.Component {
             <div className='news'>
                 {this.renderNews()}
                 {
-                    data.length ? <strong className={'news__count'}>Всего новостей: {data.length}</strong> : null
+                    data ? <strong className={'news__count'}>Всего новостей: {data.length}</strong> : null
                 }
             </div>
         );
